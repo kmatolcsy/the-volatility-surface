@@ -1,38 +1,62 @@
 import { useState, useEffect } from 'react';
-import { csv } from 'd3';
+import { csv, line, scaleLinear, extent } from 'd3';
 
 import { Point3D } from './Point3D'
-import { Polygon3D } from './Polygon3D'
+import { Surface3D } from './Surface3D'
+import { readData } from './utils'
 
 const url = 'https://raw.githubusercontent.com/kmatolcsy/options/master/2021-04-16/implied_vols_parametric_dfw.csv'
 
 export const App = () => {
-  let [alpha, setAlpha] = useState(0)
-  let [data, setData] = useState([])
+  let [data, setData] = useState(null)
+  let [beta, setBeta] = useState(0)
+  let [gamma, setGamma] = useState(0)
 
   useEffect(() => {
     csv(url).then(setData)
   }, [])
 
+  if (!data)
+    return 'loading'
+
+  const df = readData(data)
+
   // const angles = {alpha: Math.PI, beta: Math.PI / 2, gamma: -Math.PI / 2}
-  const angles = {
-    alpha: alpha,
-    beta: Math.PI * 2,
-    gamma: Math.PI * 2
+  const scaler = 300
+  const scales = {
+    x: scaleLinear()
+      .domain(extent(df.columns))
+      .range([0, scaler]),
+
+    y: scaleLinear()
+      .domain(extent(df.index))
+      .range([0, scaler]),
+
+    z: scaleLinear()
+      .domain(extent(df.values.flat()))
+      .range([0, scaler])
   }
 
-  let center = new Point3D(0, 0, 0);
-  let triangle = new Polygon3D([
-    new Point3D(1, 1, 0),
-    new Point3D(2, 1, 0),
-    new Point3D(1, 2, 0),
-  ]).scale(50).rotate(center, angles)
-  
+  const angles = {
+    alpha: 0,
+    beta: beta,
+    gamma: gamma
+  }
+
+  let center = new Point3D([1, 1, 0.1392]).scale(scales);
+  let surface = new Surface3D(df).scale(scales).rotate(center, angles)
+
+  const handleMouseMove = event => {
+    setBeta(event.clientX / 900 * Math.PI * 2)
+    setGamma(event.clientY / 600 * Math.PI * 2)
+  }
+
   return (
-    <svg width='900' height='600' onMouseMove={e => setAlpha(e.clientX / 900 * Math.PI * 2)}>
+    <svg width='900' height='600' color='red' onMouseMove={handleMouseMove}>
       <g transform='translate(450, 300)'>
+        <circle cx={0} cy={0} r='3' fill='red'></circle>
         <circle cx={center.x} cy={center.y} r='3'></circle>
-        <path d={triangle.data()} fill='blue'></path>
+        {surface.paths.map(path => <path d={path.data}></path>)}
       </g>
     </svg>
   );
