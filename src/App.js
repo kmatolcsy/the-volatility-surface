@@ -1,27 +1,54 @@
-import { useState, useEffect } from 'react';
-import { csv, line, scaleLinear, extent } from 'd3';
+import { useState, useEffect, useRef } from 'react';
+import { csv, scaleLinear, extent, select, drag } from 'd3';
+import { mean } from 'mathjs';
 
+import { Marks } from './Marks'
 import { Point3D } from './Point3D'
-import { Surface3D } from './Surface3D'
+import { Surface3D } from './Surface3D';
 import { readData } from './utils'
+
 
 const url = 'https://raw.githubusercontent.com/kmatolcsy/options/master/2021-04-16/implied_vols_parametric_dfw.csv'
 
+const initialAngles = {
+  alpha: 0,
+  beta: 0,
+  gamma: 0
+}
+
 export const App = () => {
+  let [angles, setAngles] = useState(initialAngles)
   let [data, setData] = useState(null)
-  let [beta, setBeta] = useState(0)
-  let [gamma, setGamma] = useState(0)
+
+  // before render
+  useEffect(() => csv(url).then(setData), [])
+
+  const start = useRef({ x: 0, y: 0 })
+
+  const handleStart = event => {
+    start.current = { x: event.x, y: event.y }
+  }
+
+  const handleDrag = event => setAngles({
+    alpha: angles.alpha,
+    beta: angles.beta + (event.x - start.current.x) / 300 * Math.PI,
+    gamma: angles.gamma - (event.y - start.current.y) / 300 * Math.PI
+  })
 
   useEffect(() => {
-    csv(url).then(setData)
-  }, [])
+    const dragBehaviour = drag()
+      .on('start', handleStart)
+      .on('drag', handleDrag)
+      .on('end', event => console.log('end'))
+
+    select('svg').call(dragBehaviour)
+  })
 
   if (!data)
     return 'loading'
 
   const df = readData(data)
 
-  // const angles = {alpha: Math.PI, beta: Math.PI / 2, gamma: -Math.PI / 2}
   const scaler = 300
   const scales = {
     x: scaleLinear()
@@ -30,33 +57,22 @@ export const App = () => {
 
     y: scaleLinear()
       .domain(extent(df.index))
-      .range([0, scaler]),
+      .range([scaler, 0]),
 
     z: scaleLinear()
       .domain(extent(df.values.flat()))
       .range([0, scaler])
   }
 
-  const angles = {
-    alpha: 0,
-    beta: beta,
-    gamma: gamma
-  }
-
-  let center = new Point3D([1, 1, 0.1392]).scale(scales);
+  let center = new Point3D([1, 1, mean(extent(df.values.flat()))]).scale(scales)
   let surface = new Surface3D(df).scale(scales).rotate(center, angles)
 
-  const handleMouseMove = event => {
-    setBeta(event.clientX / 900 * Math.PI * 2)
-    setGamma(event.clientY / 600 * Math.PI * 2)
-  }
-
   return (
-    <svg width='900' height='600' color='red' onMouseMove={handleMouseMove}>
+    <svg width='900' height='600' color='red'>
       <g transform='translate(450, 300)'>
         <circle cx={0} cy={0} r='3' fill='red'></circle>
         <circle cx={center.x} cy={center.y} r='3'></circle>
-        {surface.paths.map(path => <path d={path.data}></path>)}
+        <Marks surface={surface} />
       </g>
     </svg>
   );

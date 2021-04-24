@@ -3,25 +3,23 @@ import { Polygon3D } from './Polygon3D'
 export class Surface3D {
     constructor(df) {
         this.df = df
+
+        const coords = (i, j) => [
+            df.columns[j], df.index[i], df.values[i][j]
+        ]
+
+        const points = (i, j) => [
+            coords(i, j), coords(i, j + 1), coords(i + 1, j + 1), coords(i + 1, j),
+        ]
+
         this.polygons = []
 
-        for (let i = 0; i < this.df.index.length - 1; i++) {
-            for (let j = 0; j < this.df.columns.length - 1; j++) {
-                this.polygons.push(this._polygon(i, j))
+        for (let i = 0; i < df.index.length - 1; i++) {
+            for (let j = 0; j < df.columns.length - 1; j++) {
+                this.polygons.push(new Polygon3D(points(i, j)))
             }
         }
-    }
-
-    _polygon(i, j) {
-        const indices = [[i, j], [i, j + 1], [i + 1, j + 1], [i + 1, j]]
-
-        return new Polygon3D(
-            indices.map(([i, j]) => [
-                this.df.columns[j],
-                this.df.index[i],
-                this.df.values[i][j]
-            ])
-        )
+        
     }
 
     scale(scales) {
@@ -35,6 +33,12 @@ export class Surface3D {
     }
 
     get paths() {
-        return this.polygons
+        const compare = (a, b) => {
+            if (a.centroid.z < b.centroid.z) return -1
+            if (a.centroid.z > b.centroid.z) return +1
+            return 0
+        }
+
+        return this.polygons.sort(compare)
     }
 }
