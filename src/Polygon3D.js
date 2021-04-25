@@ -27,6 +27,21 @@ export class Polygon3D {
         }
     }
 
+    get area() {
+        let s = 0
+        const points = [...this.points, this.points[0]]
+
+        for (let i = 0; i < points.length - 1; i++) {
+
+            let p1 = points[i]
+            let p2 = points[i + 1]
+
+            s += (p2.x - p1.x) * (p2.y + p1.y)
+        }
+
+        return s
+    }
+
     get data() {
         // orthogonal projection
         return this.generator(this.points.map(point => [point.x, point.y]))

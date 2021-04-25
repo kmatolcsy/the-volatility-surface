@@ -43,6 +43,14 @@ export class Point3D {
         return this
     }
 
+    _add(other) {
+        this.x += other.x
+        this.y += other.y
+        this.z += other.z
+
+        return this
+    } 
+
     scale(scales) {
         this.x = scales.x(this.x)
         this.y = scales.y(this.y)
@@ -57,7 +65,7 @@ export class Point3D {
         const rotations = [
             this._rotateZ(angles.alpha),
             this._rotateY(angles.beta),
-            this._rotateX(angles.gamma)
+            this._rotateX(angles.gamma),        
         ]
 
         const rotationMatrix = rotations.reduce((p, c) => multiply(p, c))
@@ -67,6 +75,8 @@ export class Point3D {
         this.x = ans.subset(index(0, 0))
         this.y = ans.subset(index(1, 0))
         this.z = ans.subset(index(2, 0))
+
+        // this._add(center)
 
         return this
     }
