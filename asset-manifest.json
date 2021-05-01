@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.js": "/the-volatility-surface/static/js/main.4ff2d645.chunk.js",
-    "main.js.map": "/the-volatility-surface/static/js/main.4ff2d645.chunk.js.map",
+    "main.js": "/the-volatility-surface/static/js/main.f7cd7f57.chunk.js",
+    "main.js.map": "/the-volatility-surface/static/js/main.f7cd7f57.chunk.js.map",
     "runtime-main.js": "/the-volatility-surface/static/js/runtime-main.30194f6d.js",
     "runtime-main.js.map": "/the-volatility-surface/static/js/runtime-main.30194f6d.js.map",
-    "static/js/2.092fc391.chunk.js": "/the-volatility-surface/static/js/2.092fc391.chunk.js",
-    "static/js/2.092fc391.chunk.js.map": "/the-volatility-surface/static/js/2.092fc391.chunk.js.map",
+    "static/js/2.82303602.chunk.js": "/the-volatility-surface/static/js/2.82303602.chunk.js",
+    "static/js/2.82303602.chunk.js.map": "/the-volatility-surface/static/js/2.82303602.chunk.js.map",
     "index.html": "/the-volatility-surface/index.html",
-    "static/js/2.092fc391.chunk.js.LICENSE.txt": "/the-volatility-surface/static/js/2.092fc391.chunk.js.LICENSE.txt"
+    "static/js/2.82303602.chunk.js.LICENSE.txt": "/the-volatility-surface/static/js/2.82303602.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.30194f6d.js",
-    "static/js/2.092fc391.chunk.js",
-    "static/js/main.4ff2d645.chunk.js"
+    "static/js/2.82303602.chunk.js",
+    "static/js/main.f7cd7f57.chunk.js"
   ]
 }
